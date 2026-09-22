@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArogyaNidan Edge-360: Product Design & Engineering Specification</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 300px;
+      max-height: 360px;
+    }
+    .spec-card {
+      transition: all 0.2s ease-in-out;
+    }
+    .spec-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .active-nav {
+      border-bottom: 3px solid #0284C7;
+      color: #0369A1;
+      font-weight: 700;
+      background-color: #F0F9FF;
+    }
+    .cad-canvas-bg {
+      background-color: #0F172A;
+      background-image: radial-gradient(#1E293B 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- Chosen Palette: Technical Slate & Sky Blue (Slate-900 headers, Slate-50 canvas bg, Sky-600 active highlights, Emerald-600 validated specs) -->
+
+  <!-- Application Structure Plan:
+       This application serves as an Interactive Product Design Specification (PDS) & DFMA (Design for Manufacturing & Assembly) Dossier for "ArogyaNidan Edge-360":
+       1. Hero & Product Brief: Executive summary, key engineering constraints, physical metrics, target unit BOM cost (₹24,500).
+       2. Interactive CAD & Industrial Design Explorer: Multi-view HTML5 Canvas engine showing Exploded View, Internal PCB Layout, Microfluidic Disc Bay, and ANM Touch Interface.
+       3. Optoelectronics & Microfluidic Architecture: Detailed physics of the 4-wavelength LED photometer array and ambient room-temp dry-reagent cartridge disc.
+       4. Offline Edge-AI & Embedded Firmware System: Neural network quantization details (INT8), RISC-V SoC integration, and live interactive ANM Field Diagnostic Simulator.
+       5. Electrical, Thermal & Power Sub-System: Battery discharge simulator (LiFePO4 + Solar), thermal dissipation modeling for 48°C ambient operation.
+       6. DFMA, Local Sourcing & Regulatory Dossier: Domestic supply chain alignment (AMTZ), 85% localized BOM, and CDSCO/ICMED compliance timeline. -->
+
+  <!-- Visualization & Content Choices:
+       - Multi-Mode CAD Visualizer (HTML5 Canvas): Interactive 2D schematic renderer allowing users to toggle between Exploded Component View, PCB Layout, and Sensor Sub-systems.
+       - ANM Operational Field Simulator (Vanilla JS): Interactive software UI simulation allowing users to run simulated patient tests and see real-time triaging output.
+       - Battery Discharge & Power Load Calculator (Vanilla JS): Simulates battery lifespan under different operational modes (Solar Direct, Battery Field Test, AI Inference Peak).
+       - Cost-per-Test & BOM Allocation (Chart.js Doughnut): Visual breakdown of manufacturing components vs traditional diagnostic infrastructure.
+       - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Relying strictly on HTML5 Canvas, Unicode icons, Tailwind CSS, and Chart.js. -->
+
+  <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+  <!-- Header Banner -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="bg-sky-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wider uppercase">Novel Device Blueprint</span>
+          <span class="bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded tracking-wider uppercase">Regulatory pathway under MDR 2017 • Classification pending</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black text-white mt-1">ArogyaNidan Edge-360: Product Design Specification</h1>
+        <p class="text-slate-400 text-xs mt-0.5">Off-Grid Ruggedized Point-of-Care Diagnostic Engine for Rural Primary Care</p>
+      </div>
+      <div class="mt-3 md:mt-0 flex items-center space-x-4 bg-slate-800 p-2.5 rounded-lg border border-slate-700">
+        <div class="text-right">
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Target BOM Unit Cost</div>
+          <div class="text-base font-extrabold text-emerald-400">₹24,500 <span class="text-xs text-slate-400 font-normal">(~$295 USD)</span></div>
+        </div>
+        <div class="text-2xl">⚡</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-[65px] z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex space-x-1 overflow-x-auto py-2 no-scrollbar" id="nav-tabs">
+        <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active-nav px-3.5 py-2 text-xs font-semibold rounded-md whitespace-nowrap transition-colors">
+          📐 Executive Product Brief
+        </button>
+        <button onclick="switchTab('cad')" id="tab-cad" class="tab-btn px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-md whitespace-nowrap transition-colors">
+          🛠️ Interactive CAD & Schematics
+        </button>
+        <button onclick="switchTab('optics')" id="tab-optics" class="tab-btn px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-md whitespace-nowrap transition-colors">
+          🧪 Microfluidics & Sensor Physics
+        </button>
+        <button onclick="switchTab('software')" id="tab-software" class="tab-btn px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-md whitespace-nowrap transition-colors">
+          🧠 Edge-AI & Software Simulation
+        </button>
+        <button onclick="switchTab('power')" id="tab-power" class="tab-btn px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-md whitespace-nowrap transition-colors">
+          🔋 Power & Thermal Engineering
+        </button>
+        <button onclick="switchTab('dfma')" id="tab-dfma" class="tab-btn px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-md whitespace-nowrap transition-colors">
+          🏭 DFMA & Regulatory File
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow">
+
+    <!-- TAB 1: EXECUTIVE PRODUCT BRIEF -->
+    <section id="content-overview" class="tab-content space-y-6">
+      
+      <!-- Intro Context Banner -->
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Engineering Objective & Problem Statement</h2>
+        <p class="text-xs text-sky-800 mt-1 leading-relaxed">
+          The <strong>ArogyaNidan Edge-360</strong> is engineered to solve the critical bottlenecks of rural healthcare delivery in India: a <strong>68% shortage of specialists at Community Health Centres (CHCs)</strong>, <strong>lack of cold-chain infrastructure for diagnostic reagents</strong>, and an <strong>18% Inverted GST structure</strong> that penalizes local manufacturing. By integrating a 4-wavelength micro-spectrophotometer, digital piezo-acoustic stethoscope, polarized macro-camera, and zero-internet edge AI into a single IP67 drop-resistant handheld, it is intended to support Auxiliary Nurse Midwives (ANMs) with preliminary screening and triage at community level; clinical performance and intended-use claims remain subject to validation.
+        </p>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Total Enclosure Weight</div>
+          <div class="text-xl font-black text-slate-900 mt-0.5">850 Grams</div>
+          <div class="text-[10px] text-sky-600 font-semibold mt-1">Single-Handed ANM Ergonomics</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Operating Temperature</div>
+          <div class="text-xl font-black text-slate-900 mt-0.5">10°C to 48°C</div>
+          <div class="text-[10px] text-emerald-600 font-semibold mt-1">Zero Cold-Chain Needed</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Test Execution Time</div>
+          <div class="text-xl font-black text-slate-900 mt-0.5">&lt; 90 Seconds</div>
+          <div class="text-[10px] text-sky-600 font-semibold mt-1">12 Biomarkers + AI Triaging</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="text-[10px] font-bold uppercase text-slate-400">Battery Autonomy</div>
+          <div class="text-xl font-black text-slate-900 mt-0.5">~18 h target</div>
+          <div class="text-[10px] text-emerald-600 font-semibold mt-1">Defined field-profile target; verification pending</div>
+        </div>
+      </div>
+
+      <!-- Product Feature Matrix -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm spec-card">
+          <div class="w-9 h-9 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-lg mb-3">🩸</div>
+          <h3 class="font-bold text-slate-900 text-sm mb-1">Cold-Chain Free Microfluidics</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Accepts single-drop capillary blood (40 µL) onto cyclic olefin copolymer (COC) dry-reagent discs. Microfluidic channels deliver quantitative results for Hb, HbA1c, Glucose, Creatinine, Electrolytes, and Bilirubin without liquid reagent refrigeration.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm spec-card">
+          <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg mb-3">🧠</div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">On-Device Edge-AI Engine</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Powered by a dual-core 32-bit RISC-V microcontroller with an integrated 1.2 TOPS Neural Processing Unit (NPU). Executes INT8 quantized neural models for conjunctival anemia screening, retinal vascular scoring, and pulmonary sound classification without cellular internet.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm spec-card">
+          <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg mb-3">🛡️</div>
+          <h3 class="font-bold text-slate-900 text-base mb-1">Ruggedized Field Hardware</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Dual-injection Polycarbonate/ABS chassis with corner elastomeric bumpers. Designed to target 1.5-meter drop resistance and IP67 ingress protection; verification testing pending.
+          </p>
+        </div>
+      </div>
+
+      <!-- Physical System Design Parameters -->
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">Physical System Parameters & Envelope</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span class="text-slate-400 block font-bold text-[10px] uppercase">Enclosure Envelope</span>
+            <strong class="text-slate-800 text-sm">215mm x 110mm x 48mm</strong>
+            <p class="text-slate-500 mt-1">Optimized for single-hand grip with rear anti-slip silicone strap.</p>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span class="text-slate-400 block font-bold text-[10px] uppercase">Display Unit</span>
+            <strong class="text-slate-800 text-sm">4.3" Transflective TFT LCD</strong>
+            <p class="text-slate-500 mt-1">High-contrast readability under direct midday sunlight (800 nits brightness).</p>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span class="text-slate-400 block font-bold text-[10px] uppercase">Power Source</span>
+            <strong class="text-slate-800 text-sm">6400mAh LiFePO4 Pack</strong>
+            <p class="text-slate-500 mt-1">2,000+ cycle design target; integrated 5W peak-rated back-panel solar assist, with field performance to be verified.</p>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <span class="text-slate-400 block font-bold text-[10px] uppercase">Data Telemetry</span>
+            <strong class="text-slate-800 text-sm">Offline BLE 5.2 + ABHA Sync</strong>
+            <p class="text-slate-500 mt-1">Auto-syncs encrypted patient records when returning to Wi-Fi/cellular range.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: INTERACTIVE CAD & SCHEMATICS -->
+    <section id="content-cad" class="tab-content hidden space-y-6">
+      
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Interactive Hardware Schematic & Layout Explorer</h2>
+        <p class="text-xs text-sky-800 mt-1">
+          Select different mechanical layer views on the interactive canvas below to inspect internal component placement, optical alignment paths, microfluidic disc docking, and PCB layout architecture.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Interactive Canvas CAD Visualizer -->
+        <div class="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Device CAD Schematic & Internal Architecture</h3>
+              <p class="text-[11px] text-slate-500">Click labeled interactive nodes or use view controls to inspect sub-systems</p>
+            </div>
+            <div class="flex space-x-1 text-xs bg-slate-100 p-1 rounded-lg border border-slate-200">
+              <button onclick="setCadView('exploded')" id="cad-btn-exploded" class="px-2.5 py-1 font-semibold rounded bg-white shadow-xs text-sky-700">Exploded View</button>
+              <button onclick="setCadView('pcb')" id="cad-btn-pcb" class="px-2.5 py-1 font-semibold rounded text-slate-600 hover:text-slate-900">PCB Layout</button>
+              <button onclick="setCadView('optics')" id="cad-btn-optics" class="px-2.5 py-1 font-semibold rounded text-slate-600 hover:text-slate-900">Optical Path</button>
+            </div>
+          </div>
+
+          <div class="relative flex justify-center items-center cad-canvas-bg rounded-xl p-4 border border-slate-800">
+            <canvas id="cadCanvas" width="620" height="340" class="cursor-pointer max-w-full h-auto"></canvas>
+          </div>
+          <div class="flex justify-between items-center text-[10px] text-slate-400 mt-2 px-1">
+            <span>Scale: 1:1.2 Metric Draft</span>
+            <span>Tolerance Standard: ISO 2768-m</span>
+            <span>Drawing Ref: AGN-E360-REV3</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Component Spec Inspector -->
+        <div class="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm" id="cad-inspector">
+          <div class="border-b border-slate-200 pb-3 mb-3">
+            <span class="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase" id="cad-comp-cat">Sub-System Specification</span>
+            <h4 class="font-bold text-slate-900 text-base mt-1" id="cad-comp-title">Select Component Layer</h4>
+          </div>
+          <div class="space-y-3 text-xs text-slate-600">
+            <p id="cad-comp-desc">Click on any module box in the interactive CAD viewer on the left to inspect mechanical dimensions, optical wavelengths, pinouts, and local supplier sources.</p>
+            <div id="cad-comp-specs" class="space-y-2 pt-2 border-t border-slate-100 hidden">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Module Component Breakdown Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[10px] font-bold text-sky-600 uppercase">Sub-System A</div>
+          <div class="font-bold text-slate-900 text-sm mt-0.5">Microfluidic Photometer Bay</div>
+          <p class="text-xs text-slate-600 mt-1">Dual-beam spectrophotometer with LED source array (450nm, 540nm, 630nm, 880nm) and silicon photodiode detectors.</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[10px] font-bold text-sky-600 uppercase">Sub-System B</div>
+          <div class="font-bold text-slate-900 text-sm mt-0.5">Macro-Focus AI Camera</div>
+          <div class="text-xs text-slate-600 mt-1">12MP Sony IMX sensor with cross-polarized ring LEDs for non-glare palpebral conjunctiva & retinal imaging.</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[10px] font-bold text-sky-600 uppercase">Sub-System C</div>
+          <div class="font-bold text-slate-900 text-sm mt-0.5">Acoustic Stethoscope Probe</div>
+          <div class="text-xs text-slate-600 mt-1">PVDF piezoelectric sensor head with active acoustic filtering (20Hz–2000Hz) for digital lung and heart sound capture.</div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[10px] font-bold text-sky-600 uppercase">Sub-System D</div>
+          <div class="font-bold text-slate-900 text-sm mt-0.5">RISC-V NPU Engine Board</div>
+          <p class="text-xs text-slate-600 mt-1">4-layer FR4 PCB with integrated RISC-V SoC, 16MB SPI Flash, BLE module, and PMIC solar charge manager.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 3: MICROFLUIDICS & SENSOR PHYSICS -->
+    <section id="content-optics" class="tab-content hidden space-y-6">
+      
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Microfluidic Architecture & Spectrophotometry Physics</h2>
+        <p class="text-xs text-sky-800 mt-1">
+          The core innovation of the ArogyaNidan Edge-360 is its ambient-stable microfluidic disc architecture. Utilizing capillary action and lyophilized dry reagents, the disc isolates serum and measures absorbance across 4 distinct optical wavelengths.
+        </p>
+      </div>
+
+      <!-- Dry Reagent Cartridge Specification -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Cartridge Design Spec -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-2">12-Parameter Microfluidic Disc Specification</h3>
+          <p class="text-xs text-slate-500 mb-4">Injection-molded Cyclic Olefin Copolymer (COC) disc with laser-ablated capillary valves</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mb-4">
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-900 block">Sample Input Volume:</span>
+              <span class="text-slate-600">40 µL capillary whole blood (single fingerprick)</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-900 block">Shelf Life Stability:</span>
+              <span class="text-emerald-700 font-semibold">24-month / 45°C stability design target; accelerated and real-time stability studies pending</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-900 block">On-Disc Plasma Separation:</span>
+              <span class="text-slate-600">Integrated membrane filter separates red cells in 12s</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-900 block">Unit Disc Cost:</span>
+              <span class="text-slate-900 font-bold">₹24 per cartridge ($0.29 USD)</span>
+            </div>
+          </div>
+
+          <!-- Biomarker Panel Grid -->
+          <div class="border-t border-slate-200 pt-3">
+            <h4 class="font-bold text-slate-900 text-xs mb-2">Simultaneous 12-Analyte Multimodal Diagnostic Panel</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">1. Hemoglobin (Hb)</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">2. Glycated Hb (HbA1c)</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">3. Fasting Glucose</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">4. Serum Creatinine</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">5. Blood Urea Nitrogen</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">6. Total Bilirubin</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">7. Serum Electrolytes (Na/K)</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">8. ALT / AST Liver Enzymes</div>
+              <div class="p-2 bg-sky-50 rounded border border-sky-100 text-sky-900 font-medium">9. Lipid Profile (TC/HDL)</div>
+            </div>
+
+            <div class="mt-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200 text-[11px] text-indigo-900">
+              <strong>Assay architecture requirement:</strong> optical/colorimetric channels and electrochemical sensing must be separated where the analyte chemistry requires it. Sodium and potassium are therefore treated as a dedicated electrochemical sensing module rather than assuming one four-wavelength optical path can quantify every analyte.
+            </div>          </div>
+        </div>
+
+        <!-- Optical Wavelength Band Specification -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base mb-2">Spectrophotometer Optical Band Spectrum</h3>
+            <p class="text-xs text-slate-500 mb-3">Dual-beam LED photometer configuration following Beer-Lambert Absorbance Law</p>
+
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex justify-between items-center">
+                <div>
+                  <strong class="text-blue-700">450 nm (Blue LED)</strong>
+                  <div class="text-[10px] text-slate-500">Bilirubin & Enzyamatic Chromophores</div>
+                </div>
+                <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">Absorbance Peak A</span>
+              </div>
+
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex justify-between items-center">
+                <div>
+                  <strong class="text-emerald-700">540 nm (Green LED)</strong>
+                  <div class="text-[10px] text-slate-500">Cyanmethemoglobin & Glucose Reaction</div>
+                </div>
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Absorbance Peak B</span>
+              </div>
+
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex justify-between items-center">
+                <div>
+                  <strong class="text-amber-700">630 nm (Red LED)</strong>
+                  <div class="text-[10px] text-slate-500">HbA1c Immuno-turbidimetric assay</div>
+                </div>
+                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">Absorbance Peak C</span>
+              </div>
+
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex justify-between items-center">
+                <div>
+                  <strong class="text-purple-700">880 nm (Near-Infrared)</strong>
+                  <div class="text-[10px] text-slate-500">Reference channel / turbidity-correction support</div>
+                </div>
+                <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">Reference Channel</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-xs text-emerald-900">
+            <strong>Calibration Design:</strong> Internal reference-channel auto-zero is proposed to reduce optical drift from dust and temperature; analytical verification and calibration traceability are required.
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 4: EDGE-AI & SOFTWARE SIMULATION -->
+    <section id="content-software" class="tab-content hidden space-y-6">
+      
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Offline Edge-AI Engine & ANM Operational Simulation</h2>
+        <p class="text-xs text-sky-800 mt-1">
+          In rural primary care, high latency or missing cell service prevents cloud processing. The ArogyaNidan Edge-360 runs quantized neural networks directly on the embedded RISC-V processor. Test the live interactive ANM interface simulation below.
+        </p>
+      </div>
+
+      <!-- ANM Interactive Touch UI Simulator -->
+      <div class="bg-slate-900 text-white p-6 rounded-xl border border-slate-800 shadow-lg">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <span class="bg-sky-500 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase">On-Device UI Simulator</span>
+            <h3 class="text-lg font-bold text-white mt-1">ANM Decision Support System Interface</h3>
+          </div>
+          <div class="text-xs text-slate-400 mt-2 md:mt-0">
+            Target User: Auxiliary Nurse Midwife (ANM) • Language: Hindi / English / Regional
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-400 mb-4">Click a test scenario button to simulate how the Edge-AI translates complex optical and acoustic signals into intuitive color-coded triaging instructions.</p>
+
+        <!-- Scenario Control Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <button onclick="runSim('scenario1')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-left transition-all">
+            <div class="text-xs font-bold text-emerald-400">Scenario 1: Low Risk Health Screening</div>
+            <div class="text-[11px] text-slate-300 mt-1">Normal Biomarkers, Normal Heart/Lung Sounds</div>
+          </button>
+
+          <button onclick="runSim('scenario2')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-left transition-all">
+            <div class="text-xs font-bold text-amber-400">Scenario 2: Moderate Anemia & NCD Risk</div>
+            <div class="text-[11px] text-slate-300 mt-1">Hb: 7.4 g/dL, Fasting Glucose: 168 mg/dL</div>
+          </button>
+
+          <button onclick="runSim('scenario3')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-left transition-all">
+            <div class="text-xs font-bold text-red-400">Scenario 3: Urgent Pulmonary & Renal Referral</div>
+            <div class="text-[11px] text-slate-300 mt-1">Acoustic Crackles Detected, Creatinine: 2.3 mg/dL</div>
+          </button>
+        </div>
+
+        <!-- Simulated Screen Box -->
+        <div id="sim-screen" class="bg-slate-950 p-5 rounded-lg border border-slate-800 min-h-[180px] flex flex-col justify-between">
+          <div class="text-xs text-slate-500 text-center py-8">Select a test scenario above to activate the simulated ANM interface display...</div>
+        </div>
+      </div>
+
+      <!-- AI Neural Model Pipeline -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded">Vision AI Model</span>
+          <h3 class="font-bold text-slate-900 text-sm mt-2 mb-1">Conjunctival Anemia & Retinopathy</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            MobileNet-V3 architecture quantized to INT8 (4.2 MB size). Evaluates palpebral conjunctiva color pallor for non-invasive Hb correlation and flags optic disc micro-aneurysms.
+          </p>
+          <div class="bg-slate-50 p-2 rounded text-[11px] text-slate-700 border border-slate-200">
+            <strong>Design Objective:</strong> Sensitivity ≥92.4% | Specificity ≥89.1% — to be established by prospective validation
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">Acoustic AI Model</span>
+          <h3 class="font-bold text-slate-900 text-sm mt-2 mb-1">Acoustic Spectrogram Classifier</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            1D-CNN model (1.8 MB size) processing digital lung sound spectrograms to distinguish wheezes, crackles, and bronchial breath sounds associated with Pneumonia & COPD.
+          </p>
+          <div class="bg-slate-50 p-2 rounded text-[11px] text-slate-700 border border-slate-200">
+            <strong>Design Objective:</strong> Sensitivity ≥94.1% | Specificity ≥91.5% — to be established against an appropriate clinical reference standard
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded">Metabolic AI Model</span>
+          <h3 class="font-bold text-slate-900 text-sm mt-2 mb-1">CKD & NCD Risk Predictor</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            XGBoost decision tree fused into C-code (850 KB size). Combines blood creatinine, glucose, BP, and age to output 5-year Chronic Kidney Disease risk tier.
+          </p>
+          <div class="bg-slate-50 p-2 rounded text-[11px] text-slate-700 border border-slate-200">
+            <strong>Design Objective:</strong> AUC-ROC ≥0.93 for defined renal-risk endpoint — prospective validation and endpoint definition required
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 5: POWER & THERMAL ENGINEERING -->
+    <section id="content-power" class="tab-content hidden space-y-6">
+      
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Power Autonomy & Thermal Dissipation Engineering</h2>
+        <p class="text-xs text-sky-800 mt-1">
+          Rural health centers in India experience frequent 8-12 hour power outages. The ArogyaNidan Edge-360 utilizes a Lithium Iron Phosphate (LiFePO4) chemistry safe up to 60°C and a passive thermal dissipation chassis with zero cooling fans.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Interactive Power Load Simulator -->
+        <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-1">Field Battery Autonomy Calculator</h3>
+          <p class="text-xs text-slate-500 mb-4">Calculate battery lifespan based on daily screening load and solar condition</p>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Planned Patient Screenings Per Day</label>
+              <input type="range" id="power-tests" min="10" max="150" value="60" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointeraccent-sky-600" oninput="calcPower()">
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                <span>10 Patients</span>
+                <span id="power-tests-val" class="font-bold text-sky-700">60 Patients / Day</span>
+                <span>150 Patients</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Solar Trickle Assist Mode</label>
+              <select id="power-solar" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-sky-500 text-xs" onchange="calcPower()">
+                <option value="none">No Solar (100% Internal Battery)</option>
+                <option value="partial" selected>Partial Sunlight (Outdoors/Veranda) [≤2W assist target]</option>
+                <option value="full">Direct Midday Sun [≤5W peak assist]</option>
+              </select>
+            </div>
+
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+              <div class="flex justify-between">
+                <span class="text-slate-600">Illustrative Field Autonomy Estimate*:</span>
+                <span class="font-bold text-slate-900" id="res-power-hours">18.4 Hours</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Illustrative Patient Capacity*:</span>
+                <span class="font-bold text-emerald-600" id="res-power-patients">142 Patients</span>
+              </div>
+              <div class="pt-2 border-t border-slate-200 flex justify-between text-sm">
+                <span class="font-bold text-slate-800">Illustrative Field Power Status*:</span>
+                <span class="font-black text-sky-700" id="res-power-status">Pending calculation*</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOM Distribution Chart -->
+        <div class="lg:col-span-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-base mb-1">Bill of Materials (BOM) Cost Allocation</h3>
+          <p class="text-xs text-slate-500 mb-4">Target Manufacturing Cost Breakdown: ₹24,500 ($295 USD)</p>
+          <div class="chart-container">
+            <canvas id="bomChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 6: DFMA & REGULATORY FILE -->
+    <section id="content-dfma" class="tab-content hidden space-y-6">
+      
+      <div class="bg-sky-50 border-l-4 border-sky-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="text-base font-bold text-sky-900">Design for Manufacturing & Regulatory Compliance Dossier</h2>
+        <p class="text-xs text-sky-800 mt-1">
+          To bypass the <strong>18% Input vs 5% Output Inverted GST Structure</strong>, the ArogyaNidan Edge-360 is engineered for assembly using 85% domestically sourced polymers and micro-controllers within the Andhra Pradesh MedTech Zone (AMTZ).
+        </p>
+      </div>
+
+      <!-- Assembly Protocol & Sourcing Strategy -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-sm mb-3 uppercase tracking-wider">5-Step Domestic Assembly Protocol</h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-start space-x-2">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] mt-0.5">1</span>
+              <div>
+                <strong class="text-slate-900 block">Injection Molding Chassis Assembly</strong>
+                <span class="text-slate-600">Local PC/ABS housing molded at AMTZ plastic fabrication line.</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-start space-x-2">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] mt-0.5">2</span>
+              <div>
+                <strong class="text-slate-900 block">SMT PCB Surface Mounting</strong>
+                <span class="text-slate-600">4-layer RISC-V motherboard populated via high-speed SMT line in Visakhapatnam.</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-start space-x-2">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] mt-0.5">3</span>
+              <div>
+                <strong class="text-slate-900 block">Optical Engine Calibration</strong>
+                <span class="text-slate-600">LED wavelength/output calibration to traceable standards is planned; AMTZ/NIST traceability is a proposed verification route, not a completed test.</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-start space-x-2">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] mt-0.5">4</span>
+              <div>
+                <strong class="text-slate-900 block">IP67 Waterproof Sealing</strong>
+                <span class="text-slate-600">Ultrasonic welding of rubber gaskets and port covers.</span>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-start space-x-2">
+              <span class="w-5 h-5 bg-sky-600 text-white rounded-full flex items-center justify-center font-bold text-[10px] mt-0.5">5</span>
+              <div>
+                <strong class="text-slate-900 block">Burn-In & QC Testing</strong>
+                <span class="text-slate-600">48-hour thermal cycling is a planned QC gate; acceptance criteria and verification records must be established before release.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-sm mb-3 uppercase tracking-wider">Regulatory & Verification Roadmap</h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div class="flex justify-between font-bold text-slate-900 mb-1">
+                <span>Gate 1: Engineering Verification</span>
+                <span class="text-sky-600">Months 1 - 6</span>
+              </div>
+              <p class="text-slate-600">Electrical safety, EMC/EMI, environmental, usability and analytical verification against the final device configuration.</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div class="flex justify-between font-bold text-slate-900 mb-1">
+                <span>Gate 2: Clinical / Performance Validation</span>
+                <span class="text-sky-600">Months 7 - 12</span>
+              </div>
+              <p class="text-slate-600">Prospective analytical and clinical-performance evaluation against appropriate reference methods, with predefined endpoints and statistical analysis.</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div class="flex justify-between font-bold text-slate-900 mb-1">
+                <span>Gate 3: Classification & Licensing</span>
+                <span class="text-emerald-600 font-extrabold">After evidence package</span>
+              </div>
+              <p class="text-slate-600">Final classification and applicable licence pathway to be determined under the Medical Devices Rules, 2017 after intended-use freeze. ICMED may be pursued separately as a quality-certification pathway.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-900 text-sm mb-2 uppercase tracking-wider">Current Regulatory Basis (India)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200"><strong>Risk classification</strong><p class="text-slate-600 mt-1">Medical devices and IVDs are risk-classified A–D under the Medical Devices Rules, 2017. Final classification depends on intended use and applicable classification provisions; it should be confirmed for the final configuration.</p><a class="text-sky-700 font-semibold" href="https://cdsco.gov.in/opencms/opencms/en/Medical-Device-Diagnostics/Medical-Device-Diagnostics/" target="_blank">CDSCO Medical Devices</a></div>
+          <div class="p-3 bg-slate-50 rounded-lg border border-slate-200"><strong>IVD pathway</strong><p class="text-slate-600 mt-1">CDSCO states that IVDs are classified A–D and that clinical performance evaluation requirements apply under MDR 2017 for relevant new IVDs.</p><a class="text-sky-700 font-semibold" href="https://cdsco.gov.in/opencms/opencms/en/Medical-Device-Diagnostics/InVitro-Diagnostics/" target="_blank">CDSCO IVD guidance</a></div>
+        </div>
+        <div class="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900"><strong>Important:</strong> Do not label this concept “CDSCO approved/compliant” before the intended use, classification, evidence package, QMS and applicable licence requirements have actually been assessed and satisfied. ICMED should be treated as a separate quality-certification pathway.</div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      ArogyaNidan Edge-360 Product Design Blueprint • Engineered for Indian Primary Healthcare & Low-Resource Care Settings
+    </div>
+  </footer>
+
+  <!-- Application JavaScript Logic -->
+  <script>
+    // Component specification data store
+    const cadSpecsData = {
+      microfluidics: {
+        category: "Optoelectronics",
+        title: "Microfluidic Photometer Assembly",
+        desc: "Optoelectronic spectrophotometer bay reading dry-reagent microfluidic discs.",
+        specs: [
+          "• LED Wavelengths: 450nm, 540nm, 630nm, 880nm Array",
+          "• Detector: Silicon PIN Photodiode with 0.1% linearity",
+          "• Sample Volume: 40 µL whole blood disc capacity",
+          "• Operating Range: 10°C to 48°C ambient"
+        ]
+      },
+      camera: {
+        category: "Optical AI Sub-System",
+        title: "12MP Polarized Macro Camera",
+        desc: "High-resolution camera module for conjunctival/anterior-ocular screening; retinal/fundus imaging is a future-module target requiring dedicated optics.",
+        specs: [
+          "• Sensor: 12MP Sony IMX with f/1.8 optical lens",
+          "• Ring Illumination: 8x Polarized 5500K daylight LEDs",
+          "• Working Distance: 2.5cm macro fixed-focus",
+          "• Target Application: Conjunctival anemia screening; retinal imaging deferred pending dedicated optical validation"
+        ]
+      },
+      acoustic: {
+        category: "Cardiopulmonary Sub-System",
+        title: "Digital Piezo Acoustic Probe",
+        desc: "Acoustic transducer for digital lung and heart auscultation.",
+        specs: [
+          "• Frequency Bandwidth: 20 Hz – 2000 Hz",
+          "• Sensor Material: Piezoelectric PVDF polymer film",
+          "• Ambient Cancellation: Active differential acoustic mic",
+          "• Signal Interface: Shielded 3.5mm latching jack"
+        ]
+      },
+      soc: {
+        category: "Computing Hardware",
+        title: "Dual-Core RISC-V AI SoC Motherboard",
+        desc: "Low-power embedded system-on-chip running quantized neural networks offline.",
+        specs: [
+          "• CPU: Dual-Core 32-bit RISC-V @ 400 MHz",
+          "• AI NPU Accelerator: 1.2 TOPS INT8 inference engine",
+          "• Power Draw: 1.6 Watts peak under AI workload",
+          "• Memory: 16MB SPI Flash + 8MB PSRAM"
+        ]
+      },
+      battery: {
+        category: "Power Sub-System",
+        title: "6400mAh LiFePO4 Battery Pack",
+        desc: "Thermal-safe battery pack paired with rear 5W solar panel.",
+        specs: [
+          "• Chemistry: Lithium Iron Phosphate (LiFePO4)",
+          "• Thermal Envelope: Component/battery limits to be verified against final pack design",
+          "• Charge Cycles: 2,000+ cycle design target; qualification pending",
+          "• Assist Input: Integrated 5W peak-rated mono-crystalline solar module"
+        ]
+      }
+    };
+
+    let bomChartInstance = null;
+    let currentCadView = 'exploded';
+
+    // Tab Switching Logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-nav'));
+
+      document.getElementById(`content-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).classList.add('active-nav');
+
+      if (tabId === 'cad') {
+        drawCadCanvas();
+      } else if (tabId === 'power' && bomChartInstance) {
+        bomChartInstance.resize();
+      }
+    }
+
+    // Set CAD View Mode
+    function setCadView(view) {
+      currentCadView = view;
+      ['exploded', 'pcb', 'optics'].forEach(v => {
+        const btn = document.getElementById(`cad-btn-${v}`);
+        if (v === view) {
+          btn.className = "px-2.5 py-1 font-semibold rounded bg-white shadow-xs text-sky-700";
+        } else {
+          btn.className = "px-2.5 py-1 font-semibold rounded text-slate-600 hover:text-slate-900";
+        }
+      });
+      drawCadCanvas();
+    }
+
+    // Inspect CAD Component
+    function selectCadComp(key) {
+      const data = cadSpecsData[key];
+      if (!data) return;
+
+      document.getElementById('cad-comp-cat').innerText = data.category;
+      document.getElementById('cad-comp-title').innerText = data.title;
+      document.getElementById('cad-comp-desc').innerText = data.desc;
+
+      const list = document.getElementById('cad-comp-specs');
+      list.classList.remove('hidden');
+      list.innerHTML = data.specs.map(s => `<div class="p-1.5 bg-slate-50 rounded border border-slate-200 font-mono text-[11px] text-slate-700">${s}</div>`).join('');
+    }
+
+    // Canvas CAD Drawing Logic
+    function drawCadCanvas() {
+      const canvas = document.getElementById('cadCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (currentCadView === 'exploded') {
+        // Outer Device Frame
+        ctx.fillStyle = "#1E293B";
+        ctx.beginPath();
+        ctx.roundRect(110, 40, 400, 260, 16);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#38BDF8";
+        ctx.stroke();
+
+        // Screen Display
+        ctx.fillStyle = "#0F172A";
+        ctx.fillRect(140, 60, 340, 80);
+        ctx.strokeStyle = "#475569";
+        ctx.strokeRect(140, 60, 340, 80);
+
+        ctx.fillStyle = "#38BDF8";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText("ArogyaNidan Edge-360 [ANM Ready]", 155, 85);
+        ctx.fillStyle = "#34D399";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("• Battery: 100% (Solar Active) | Field Mode", 155, 105);
+        ctx.fillText("• System: All 12 Biosensors Ready", 155, 122);
+
+        // Interactive Module Nodes
+        drawCadBox(ctx, 140, 160, 160, 55, "#0284C7", "Microfluidic Bay", () => selectCadComp('microfluidics'));
+        drawCadBox(ctx, 320, 160, 160, 55, "#059669", "12MP Optical Lens", () => selectCadComp('camera'));
+        drawCadBox(ctx, 140, 230, 160, 50, "#D97706", "Acoustic Probe Port", () => selectCadComp('acoustic'));
+        drawCadBox(ctx, 320, 230, 160, 50, "#4F46E5", "RISC-V NPU Board", () => selectCadComp('soc'));
+
+      } else if (currentCadView === 'pcb') {
+        // PCB Motherboard Surface
+        ctx.fillStyle = "#064E3B"; // PCB surface
+        ctx.fillRect(120, 50, 380, 240);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#10B981";
+        ctx.strokeRect(120, 50, 380, 240);
+
+        // PCB Copper Traces
+        ctx.strokeStyle = "#047857";
+        ctx.lineWidth = 1;
+        for (let i = 140; i < 480; i += 30) {
+          ctx.beginPath();
+          ctx.moveTo(i, 60);
+          ctx.lineTo(i + 20, 280);
+          ctx.stroke();
+        }
+
+        // Chip Modules
+        drawCadBox(ctx, 150, 80, 140, 80, "#1E293B", "RISC-V SoC Chip", () => selectCadComp('soc'));
+        drawCadBox(ctx, 320, 80, 150, 80, "#0284C7", "Microfluidic Photometer IC", () => selectCadComp('microfluidics'));
+        drawCadBox(ctx, 150, 180, 140, 90, "#D97706", "LiFePO4 PMIC Board", () => selectCadComp('battery'));
+        drawCadBox(ctx, 320, 180, 150, 90, "#059669", "BLE 5.2 Telemetry", () => selectCadComp('camera'));
+
+      } else if (currentCadView === 'optics') {
+        // Optical Chamber Schematic
+        ctx.fillStyle = "#0F172A";
+        ctx.fillRect(100, 50, 420, 240);
+
+        // Light Beam Path
+        ctx.fillStyle = "rgba(56, 189, 248, 0.2)";
+        ctx.fillRect(160, 120, 300, 60);
+
+        // LED Array
+        ctx.fillStyle = "#EF4444"; ctx.fillRect(140, 120, 20, 15); // Red
+        ctx.fillStyle = "#10B981"; ctx.fillRect(140, 135, 20, 15); // Green
+        ctx.fillStyle = "#3B82F6"; ctx.fillRect(140, 150, 20, 15); // Blue
+        ctx.fillStyle = "#8B5CF6"; ctx.fillRect(140, 165, 20, 15); // IR
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText("4-Wavelength LED Array", 130, 105);
+
+        // Disc Cartridge Holder
+        ctx.fillStyle = "#0284C7";
+        ctx.beginPath();
+        ctx.arc(310, 150, 40, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.textAlign = "center";
+        ctx.fillText("Microfluidic Disc", 310, 154);
+
+        // Detector
+        ctx.fillStyle = "#34D399";
+        ctx.fillRect(440, 120, 20, 60);
+        ctx.textAlign = "start";
+        ctx.fillText("Silicon Photodiode", 410, 105);
+      }
+    }
+
+    function drawCadBox(ctx, x, y, w, h, color, label, clickHandler) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 6);
+      ctx.fill();
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 11px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x + w / 2, y + h / 2 + 4);
+      ctx.textAlign = "start";
+    }
+
+    // Canvas Click Handler
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById('cadCanvas');
+      if (canvas) {
+        canvas.addEventListener('click', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          if (currentCadView === 'exploded') {
+            if (x >= 140 && x <= 300 && y >= 160 && y <= 215) selectCadComp('microfluidics');
+            if (x >= 320 && x <= 480 && y >= 160 && y <= 215) selectCadComp('camera');
+            if (x >= 140 && x <= 300 && y >= 230 && y <= 280) selectCadComp('acoustic');
+            if (x >= 320 && x <= 480 && y >= 230 && y <= 280) selectCadComp('soc');
+          } else if (currentCadView === 'pcb') {
+            if (x >= 150 && x <= 290 && y >= 80 && y <= 160) selectCadComp('soc');
+            if (x >= 320 && x <= 470 && y >= 80 && y <= 160) selectCadComp('microfluidics');
+            if (x >= 150 && x <= 290 && y >= 180 && y <= 270) selectCadComp('battery');
+            if (x >= 320 && x <= 470 && y >= 180 && y <= 270) selectCadComp('camera');
+          }
+        });
+      }
+
+      initCharts();
+      calcPower();
+      selectCadComp('microfluidics');
+    });
+
+    // Simulated ANM Interface Test Scenarios
+    function runSim(scenario) {
+      const screen = document.getElementById('sim-screen');
+      if (scenario === 'scenario1') {
+        screen.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-emerald-400">🟢 LOW RISK - Routine Screening — Illustrative</span>
+            <span class="text-[10px] text-slate-400">DEMO PATIENT</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 mt-3">
+            <div>• Hemoglobin: <strong>13.8 g/dL (Normal)</strong></div>
+            <div>• Fasting Glucose: <strong>92 mg/dL</strong></div>
+            <div>• Acoustic Lung Sound: <strong>Clear / Normal</strong></div>
+            <div>• Renal Risk Index: <strong>Low (Stage 1)</strong></div>
+          </div>
+          <div class="mt-3 p-2 bg-slate-900 rounded border border-emerald-500/30 text-[11px] text-emerald-300">
+            <strong>Recommended Action:</strong> Illustrative follow-up suggestion only; final disposition remains with the responsible clinician / program protocol.
+          </div>
+        `;
+      } else if (scenario === 'scenario2') {
+        screen.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-amber-400">🟡 MODERATE RISK — Illustrative Triage</span>
+            <span class="text-[10px] text-slate-400">DEMO PATIENT</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 mt-3">
+            <div>• Hemoglobin: <strong class="text-amber-400">7.4 g/dL (Severe Anemia)</strong></div>
+            <div>• Fasting Glucose: <strong class="text-amber-400">168 mg/dL (Elevated)</strong></div>
+            <div>• Retinal Scan: <strong>Mild Vascular Tortuosity</strong></div>
+            <div>• HbA1c: <strong>7.8%</strong></div>
+          </div>
+          <div class="mt-3 p-2 bg-slate-900 rounded border border-amber-500/30 text-[11px] text-amber-300">
+            <strong>Recommended Action:</strong> Prompt clinician review / protocol-based follow-up; treatment decisions remain under authorized clinical oversight.
+          </div>
+        `;
+      } else if (scenario === 'scenario3') {
+        screen.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-red-400">🔴 URGENT REFERRAL — Illustrative Triage</span>
+            <span class="text-[10px] text-slate-400">DEMO PATIENT</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 mt-3">
+            <div>• Acoustic Spectrogram: <strong class="text-red-400">Inspiratory Crackles (Pneumonia)</strong></div>
+            <div>• Serum Creatinine: <strong class="text-red-400">2.3 mg/dL (Elevated Renal Risk)</strong></div>
+            <div>• Blood Pressure: <strong>158 / 98 mmHg</strong></div>
+            <div>• Oxygen Saturation: <strong>92%</strong></div>
+          </div>
+          <div class="mt-3 p-2 bg-slate-900 rounded border border-red-500/30 text-[11px] text-red-300">
+            <strong>Recommended Action:</strong> Escalate to authorized clinical pathway / referral protocol; automated output is decision support, not a stand-alone emergency diagnosis.
+          </div>
+        `;
+      }
+    }
+
+    // Power Calculator Function
+    function calcPower() {
+      const tests = parseInt(document.getElementById('power-tests').value) || 60;
+      const solar = document.getElementById('power-solar').value;
+
+      document.getElementById('power-tests-val').innerText = `${tests} Patients / Day`;
+
+      // Illustrative engineering model only; replace with measured power-profile data during verification.
+      const batteryWh = 20.48; // 6.4Ah × 3.2V nominal
+      const usableFraction = 0.85;
+      const usableWh = batteryWh * usableFraction;
+      const baseAverageW = 0.65;
+      const testEnergyWh = 0.12;
+      const fieldHoursPerDay = 8;
+
+      let solarAssistWhPerDay = 0;
+      if (solar === 'partial') solarAssistWhPerDay = 2.0;
+      if (solar === 'full') solarAssistWhPerDay = 5.0;
+
+      const dailyLoadWh = (baseAverageW * fieldHoursPerDay) + (tests * testEnergyWh);
+      const netDailyWh = Math.max(dailyLoadWh - solarAssistWhPerDay, 0.1);
+      const autonomyDays = usableWh / netDailyWh;
+      const equivalentFieldHours = (usableWh / Math.max(baseAverageW + (tests * testEnergyWh / fieldHoursPerDay), 0.1));
+      const patientCapacity = Math.max(0, Math.floor((usableWh + solarAssistWhPerDay - (baseAverageW * fieldHoursPerDay)) / testEnergyWh));
+
+      document.getElementById('res-power-hours').innerText = `${equivalentFieldHours.toFixed(1)} h*`;
+      document.getElementById('res-power-patients').innerText = `${patientCapacity} tests*`;
+      document.getElementById('res-power-status').innerText = `${autonomyDays.toFixed(1)} field-days*`;
+    }
+
+    // Chart.js Bill of Materials Distribution
+    function initCharts() {
+      const ctxBom = document.getElementById('bomChart').getContext('2d');
+      bomChartInstance = new Chart(ctxBom, {
+        type: 'doughnut',
+        data: {
+          labels: [
+            'Microfluidic Photometer (30%)',
+            'RISC-V AI SoC & PCB (25%)',
+            '12MP Optical Camera Lens (20%)',
+            'LiFePO4 & Solar Unit (15%)',
+            'IP67 Rugged Enclosure (10%)'
+          ],
+          datasets: [{
+            data: [30, 25, 20, 15, 10],
+            backgroundColor: [
+              '#0284C7',
+              '#4F46E5',
+              '#059669',
+              '#D97706',
+              '#64748B'
+            ],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { boxWidth: 12, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
